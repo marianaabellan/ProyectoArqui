@@ -42,6 +42,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Hilillo.cs" />
+    <Compile Include="Memoria.cs" />
+    <Compile Include="NucleoMonohilillo.cs" />
+    <Compile Include="NucleoMultihilillo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
