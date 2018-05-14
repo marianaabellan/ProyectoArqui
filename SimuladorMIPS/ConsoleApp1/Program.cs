@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Collections;
 
 namespace SimuladorMIPS
 {
@@ -13,6 +14,7 @@ namespace SimuladorMIPS
             Memoria mem = Memoria.Instance;
             NucleoMultihilillo N0 = NucleoMultihilillo.Instance;
             NucleoMonohilillo N1 = NucleoMonohilillo.Instance;
+            Queue colaHilillos = new Queue(); // Hay que settear los núcleos con esta cola.
         }
     }
 }
