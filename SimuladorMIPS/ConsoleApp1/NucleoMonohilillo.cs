@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Collections;
 
 namespace SimuladorMIPS
 {
@@ -11,7 +12,7 @@ namespace SimuladorMIPS
         // Patrón singleton.
         private static NucleoMonohilillo instance = null;
 
-        // Esto es un "Property" de C#.
+        // TIP: Esto es un "Property" de C#.
         public static NucleoMonohilillo Instance
         {
             get
@@ -22,7 +23,17 @@ namespace SimuladorMIPS
             }
         }
 
+        public Queue ColaHilillos { get; set; }
+
+        public bool Terminado { get; set; }
+
         private NucleoMonohilillo()
+        {
+            // TODO: Inicializar cachés con ceros.
+        }
+
+        // TODO: Carga un hilillo y ejecuta run() en un ciclo infinito.
+        public void start()
         {
 
         }
