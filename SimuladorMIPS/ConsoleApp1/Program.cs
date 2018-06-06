@@ -21,8 +21,6 @@ namespace SimuladorMIPS
             N0.ColaHilillos = colaHilillos;
             N1.ColaHilillos = colaHilillos;
 
-            // TODO: Inicializar memoria con unos.
-
             // TODO: Solicitar al usuario hilillos a correr.
 
             // TODO: Cargar hilillos en memoria.
