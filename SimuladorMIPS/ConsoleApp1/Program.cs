@@ -21,6 +21,7 @@ namespace SimuladorMIPS
             Queue<Hilillo> colaHilillos = new Queue<Hilillo>();
             int reloj = 0;
 
+            // TIP: La clase Debug permite imprimir mensajes de debug en una consola distinta de la principal.
             Debug.Print("Asignando cola de hilillos a núcleos...");
             N0.ColaHilillos = colaHilillos;
             N1.ColaHilillos = colaHilillos;
