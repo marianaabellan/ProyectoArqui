@@ -5,6 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Collections;
 using System.Threading;
+using System.Diagnostics;
+
+// <>
 
 namespace SimuladorMIPS
 {
@@ -15,9 +18,10 @@ namespace SimuladorMIPS
             Memoria mem = Memoria.Instance;
             NucleoMultihilillo N0 = NucleoMultihilillo.Instance;
             NucleoMonohilillo N1 = NucleoMonohilillo.Instance;
-            Queue colaHilillos = new Queue();
+            Queue<Hilillo> colaHilillos = new Queue<Hilillo>();
             int reloj = 0;
 
+            Debug.Print("Asignando cola de hilillos a núcleos...");
             N0.ColaHilillos = colaHilillos;
             N1.ColaHilillos = colaHilillos;
 
@@ -30,6 +34,7 @@ namespace SimuladorMIPS
             // TODO: Solicitar al usuario modalidad de ejecución (lenta/rápida).
             bool ejecucionLentaActivada = false;
 
+            Debug.Print("Creando hilos de simulación...");
             Thread nucleo0 = new Thread(N0.start);
             Thread nucleo1 = new Thread(N1.start);
 
@@ -37,12 +42,14 @@ namespace SimuladorMIPS
             nucleo0.Start();
             nucleo1.Start();
 
+            Debug.Print("Hilo principal: Entrando a sección crítica: revisando si los núcleos terminaron...");
             Monitor.Enter(N0.Terminado);
             Monitor.Enter(N1.Terminado);
             while(!N0.Terminado || !N1.Terminado) // Sección crítica.
             {
                 Monitor.Exit(N0.Terminado);
                 Monitor.Exit(N1.Terminado);
+                Debug.Print("Hilo principal: fin de sección crítica. Los núcleos no han terminado.");
 
                 reloj++;
 
@@ -56,11 +63,13 @@ namespace SimuladorMIPS
                     Console.ReadKey();
                 }
 
+                Debug.Print("Hilo principal: Entrando a sección crítica: revisando si los núcleos terminaron...");
                 Monitor.Enter(N0.Terminado);
                 Monitor.Enter(N1.Terminado);
             }
             Monitor.Exit(N0.Terminado);
             Monitor.Exit(N1.Terminado);
+            Debug.Print("Hilo principal: fin de sección crítica. Los núcleos terminaron.");
 
             // TODO: Imprimir contenido de memoria y cachés.
 

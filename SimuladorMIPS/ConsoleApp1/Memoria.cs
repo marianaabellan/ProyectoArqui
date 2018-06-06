@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace SimuladorMIPS
 {
@@ -32,10 +33,15 @@ namespace SimuladorMIPS
             {
                 Mem[i] = 1;
             }
+            Debug.Print("Memoria creada.");
         }
 
+        // Los buses podrían ser cualquier estructura de datos.
+        // Lo único que nos interesa son los locks de estos objetos.
+        // Usé bool para que tomen menos espacio.
         public bool BusDeDatos { get; set; }
         public bool BusDeInstrucciones { get; set; }
+
         public int[] Mem { get; set; }
 
         

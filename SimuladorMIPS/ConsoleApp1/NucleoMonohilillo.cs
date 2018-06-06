@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Collections;
+using System.Diagnostics;
 
 namespace SimuladorMIPS
 {
@@ -23,13 +24,14 @@ namespace SimuladorMIPS
             }
         }
 
-        public Queue ColaHilillos { get; set; }
+        public Queue<Hilillo> ColaHilillos { get; set; }
 
         public bool Terminado { get; set; }
 
         private NucleoMonohilillo()
         {
             // TODO: Inicializar cachés con ceros.
+            Debug.Print("Núcleo 1 creado.");
         }
 
         // TODO: Carga un hilillo y ejecuta run() en un ciclo infinito.
