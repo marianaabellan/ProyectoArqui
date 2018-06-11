@@ -9,5 +9,11 @@ namespace SimuladorMIPS
 {
     class Hilillo
     {
+        public Hilillo(int direccionDeInicio)
+        {
+            PC = direccionDeInicio;
+        }
+
+        public int PC { get; set; }
     }
 }

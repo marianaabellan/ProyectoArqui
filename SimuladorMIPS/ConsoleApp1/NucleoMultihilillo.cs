@@ -39,5 +39,7 @@ namespace SimuladorMIPS
         {
 
         }
+
+        public int Quantum { get; set; }
     }
 }

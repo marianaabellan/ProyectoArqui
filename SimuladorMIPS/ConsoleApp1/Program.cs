@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Collections;
 using System.Threading;
 using System.Diagnostics;
+using System.IO;
 
 // <>
 
@@ -26,14 +27,56 @@ namespace SimuladorMIPS
             N0.ColaHilillos = colaHilillos;
             N1.ColaHilillos = colaHilillos;
 
-            // TODO: Solicitar al usuario hilillos a correr.
+            // Solicitar al usuario hilillos a correr y cargarlos en memoria.
+            int direccionDeInicioDeHilillo = 384; // Indica dónde comienza las instrucciones de cada hilillo.
+            Console.WriteLine("Usted se encuentra en la carpeta " + Directory.GetCurrentDirectory());
 
-            // TODO: Cargar hilillos en memoria.
+            Console.WriteLine("Inserte el nombre de un archivo hilillo o 'c' para continuar.");
+            string nombreDeArchivo = Console.ReadLine();
 
-            // TODO: Solicitar al usuario el quantum.
+            // TODO: Revisar posibles excepciones.
+            while (nombreDeArchivo != "c")
+            {
+                Hilillo h = new Hilillo(direccionDeInicioDeHilillo);
+                colaHilillos.Enqueue(h);
 
-            // TODO: Solicitar al usuario modalidad de ejecución (lenta/rápida).
+                StreamReader archivo = new StreamReader(nombreDeArchivo);
+                while (!archivo.EndOfStream)
+                {
+                    string instruccion = "";
+                    try
+                    {
+                        instruccion = archivo.ReadLine();
+                    }
+                    catch (IOException e)
+                    {
+                        // TODO: Revisar qué hacer en este caso.
+                        Console.WriteLine("Error al leer el archivo.");
+                        break;
+                    }
+                    string[] temp = instruccion.Split(' ');
+                    for (int i = 0; i < 4; i++)
+                        mem.Mem[direccionDeInicioDeHilillo + i] = Convert.ToInt32(temp[i]);
+                    direccionDeInicioDeHilillo += 4;
+                }
+
+                Console.WriteLine("Inserte el nombre de un archivo hilillo o 'c' para continuar.");
+                nombreDeArchivo = Console.ReadLine();
+            }
+
+            // Solicitar al usuario el quantum.
+            Console.WriteLine("Inserte el quantum:");
+            int quantum = Convert.ToInt32(Console.ReadLine());
+            N0.Quantum = N1.Quantum = quantum;
+
+            // Solicitar al usuario modalidad de ejecución (lenta/rápida).
             bool ejecucionLentaActivada = false;
+            Console.WriteLine("¿Desea activar la modalidad de ejecución lenta? (s/n)");
+            if (Console.ReadLine() == "s")
+            {
+                ejecucionLentaActivada = true;
+                Console.WriteLine("Ejecución lenta activada.");
+            }
 
             Debug.Print("Creando hilos de simulación...");
             Thread nucleo0 = new Thread(N0.start);
@@ -59,7 +102,7 @@ namespace SimuladorMIPS
 
                 if (ejecucionLentaActivada && reloj % 20 == 0)
                 {
-                    // TODO: Imprimir memoria cachés y registros.
+                    // TODO: Imprimir memoria, cachés y registros.
 
                     Console.ReadKey();
                 }
