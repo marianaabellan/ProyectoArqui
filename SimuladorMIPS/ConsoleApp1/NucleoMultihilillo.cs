@@ -37,7 +37,13 @@ namespace SimuladorMIPS
         // TODO: Carga un hilillo en H0 y ejecuta run() en un ciclo infinito.
         public void start()
         {
+            throw new NotImplementedException();
+        }
 
+        // TODO: Retorna información general de los hilillos que están corriendo para desplegarla en pantalla durante la ejecución.
+        public string PrettyPrintHilillos()
+        {
+            throw new NotImplementedException();
         }
 
         public int Quantum { get; set; }

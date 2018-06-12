@@ -15,5 +15,7 @@ namespace SimuladorMIPS
         }
 
         public int PC { get; set; }
+
+        // TODO: Nombre e identificación.
     }
 }

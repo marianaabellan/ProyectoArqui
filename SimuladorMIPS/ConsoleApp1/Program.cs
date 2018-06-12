@@ -31,7 +31,7 @@ namespace SimuladorMIPS
             int direccionDeInicioDeHilillo = 384; // Indica dónde comienza las instrucciones de cada hilillo.
             Console.WriteLine("Usted se encuentra en la carpeta " + Directory.GetCurrentDirectory());
 
-            Console.WriteLine("Inserte el nombre de un archivo hilillo o 'c' para continuar.");
+            Console.WriteLine("Inserte el nombre de un archivo de hilillo o 'c' para continuar.");
             string nombreDeArchivo = Console.ReadLine();
 
             // TODO: Revisar posibles excepciones.
@@ -39,6 +39,7 @@ namespace SimuladorMIPS
             {
                 Hilillo h = new Hilillo(direccionDeInicioDeHilillo);
                 colaHilillos.Enqueue(h);
+                // TODO: Asignar nombre e identificación.
 
                 StreamReader archivo = new StreamReader(nombreDeArchivo);
                 while (!archivo.EndOfStream)
@@ -97,8 +98,18 @@ namespace SimuladorMIPS
 
                 reloj++;
 
-                // TODO: Imprimir reloj.
-                // TODO: Imprimir identificación de hilillos en ejecución.
+                Console.Clear();
+
+                // Imprimir reloj.
+                Console.WriteLine("Reloj: " + reloj);
+
+                // Imprimir identificación de hilillos en ejecución.
+                Console.WriteLine("Hilillos en ejecución:");
+                Console.WriteLine("     Núcleo 0:");
+                Console.WriteLine(N0.PrettyPrintHilillos()); // TODO: Sección crítica.
+
+                Console.WriteLine("     Núcleo 1:");
+                Console.WriteLine(N1.PrettyPrintHilillos()); // TODO: Sección crítica.
 
                 if (ejecucionLentaActivada && reloj % 20 == 0)
                 {
