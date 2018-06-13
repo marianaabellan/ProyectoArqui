@@ -20,12 +20,15 @@ namespace SimuladorMIPS
             NucleoMultihilillo N0 = NucleoMultihilillo.Instance;
             NucleoMonohilillo N1 = NucleoMonohilillo.Instance;
             Queue<Hilillo> colaHilillos = new Queue<Hilillo>();
+            Barrier barrera = new Barrier(3);
             int reloj = 0;
 
             // TIP: La clase Debug permite imprimir mensajes de debug en una consola distinta de la principal.
-            Debug.Print("Asignando cola de hilillos a núcleos...");
+            Debug.Print("Asignando cola de hilillos y barrera a núcleos...");
             N0.ColaHilillos = colaHilillos;
             N1.ColaHilillos = colaHilillos;
+            N0.Barrera = barrera;
+            N1.Barrera = barrera;
 
             // Solicitar al usuario hilillos a correr y cargarlos en memoria.
             int direccionDeInicioDeHilillo = 384; // Indica dónde comienza las instrucciones de cada hilillo.
@@ -80,8 +83,8 @@ namespace SimuladorMIPS
             }
 
             Debug.Print("Creando hilos de simulación...");
-            Thread nucleo0 = new Thread(N0.start);
-            Thread nucleo1 = new Thread(N1.start);
+            Thread nucleo0 = new Thread(N0.Start);
+            Thread nucleo1 = new Thread(N1.Start);
 
             // Esto echa a andar los hilos.
             nucleo0.Start();
@@ -117,6 +120,9 @@ namespace SimuladorMIPS
 
                     Console.ReadKey();
                 }
+
+                // Pasar por la barrera.
+                barrera.SignalAndWait();
 
                 Debug.Print("Hilo principal: Entrando a sección crítica: revisando si los núcleos terminaron...");
                 Monitor.Enter(N0.Terminado);

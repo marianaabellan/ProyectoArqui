@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Collections;
 using System.Diagnostics;
+using System.Threading;
 
 namespace SimuladorMIPS
 {
@@ -24,9 +25,6 @@ namespace SimuladorMIPS
             }
         }
 
-        public Queue<Hilillo> ColaHilillos { get; set; }
-
-        public bool Terminado { get; set; }
 
         private NucleoMonohilillo()
         {
@@ -35,7 +33,7 @@ namespace SimuladorMIPS
         }
 
         // TODO: Carga un hilillo y ejecuta run() en un ciclo infinito.
-        public void start()
+        public void Start()
         {
             throw new NotImplementedException();
         }
@@ -46,6 +44,9 @@ namespace SimuladorMIPS
             throw new NotImplementedException();
         }
 
+        public Queue<Hilillo> ColaHilillos { get; set; }
+        public bool Terminado { get; set; }
         public int Quantum { get; set; }
+        public Barrier Barrera { get; set; }
     }
 }
