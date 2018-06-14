@@ -36,6 +36,12 @@ namespace SimuladorMIPS
             Debug.Print("Memoria creada.");
         }
 
+        // TODO: Retorna los contenidos de la memoria de forma que sea legible en la consola.
+        public string PrettyPrint()
+        {
+            throw new NotImplementedException();
+        }
+
         // Los buses podrían ser cualquier estructura de datos.
         // Lo único que nos interesa son los locks de estos objetos.
         // Usé bool para que tomen menos espacio.

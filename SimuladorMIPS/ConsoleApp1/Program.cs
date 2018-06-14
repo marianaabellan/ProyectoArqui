@@ -116,7 +116,16 @@ namespace SimuladorMIPS
 
                 if (ejecucionLentaActivada && reloj % 20 == 0)
                 {
-                    // TODO: Imprimir memoria, cachés y registros.
+                    // Imprimir memoria, cachés y registros.
+                    Console.WriteLine("Contenido de la memoria:");
+                    Console.WriteLine(mem.PrettyPrint()); // TODO: Sección crítica.
+
+                    Console.WriteLine("Registros y cachés:");
+                    Console.WriteLine("     Núcleo 0:");
+                    Console.WriteLine(N0.PrettyPrintRegistrosYCaches()); // TODO: Sección crítica.
+
+                    Console.WriteLine("     Núcleo 1:");
+                    Console.WriteLine(N1.PrettyPrintRegistrosYCaches()); // TODO: Sección crítica.
 
                     Console.ReadKey();
                 }
@@ -132,7 +141,21 @@ namespace SimuladorMIPS
             Monitor.Exit(N1.Terminado);
             Debug.Print("Hilo principal: fin de sección crítica. Los núcleos terminaron.");
 
-            // TODO: Imprimir contenido de memoria y cachés.
+            // Finalizar hilos y barrera.
+            nucleo0.Abort(); // TODO: Verificar el funcionamiento correcto de esta función.
+            nucleo1.Abort();
+            barrera.Dispose();
+
+            // Imprimir contenido de memoria y cachés.
+            Console.WriteLine("Contenido de la memoria:");
+            Console.WriteLine(mem.PrettyPrint());
+
+            Console.WriteLine("Registros y cachés:");
+            Console.WriteLine("     Núcleo 0:");
+            Console.WriteLine(N0.PrettyPrintRegistrosYCaches());
+
+            Console.WriteLine("     Núcleo 1:");
+            Console.WriteLine(N1.PrettyPrintRegistrosYCaches());
 
             // TODO: Para cada hilillo que corrió, imprimir registros y ciclos que duró.
             // WARNING: Revisar diseño para lograr lo anterior.

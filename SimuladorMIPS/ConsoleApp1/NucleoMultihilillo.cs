@@ -44,6 +44,12 @@ namespace SimuladorMIPS
             throw new NotImplementedException();
         }
 
+        // TODO: Retorna los contenidos de los registros y las cachés, de forma legible en consola.
+        public string PrettyPrintRegistrosYCaches()
+        {
+            throw new NotImplementedException();
+        }
+
         public Queue<Hilillo> ColaHilillos { get; set; }
         public bool Terminado { get; set; }
         public int Quantum { get; set; }
