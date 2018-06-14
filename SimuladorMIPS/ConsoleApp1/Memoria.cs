@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,8 +9,10 @@ namespace SimuladorMIPS
 {
     class Memoria
     {
-        //TODO: No estoy seguro del tamaño de la memoria.
-        private static readonly int size = 1020;
+        // 24 bloques de datos y 40 de instrucciones.
+        // Cada bloque de datos es de 4 enteros, y cada bloque de instrucciones es de 16.
+        // 24 * 4 + 40 * 16 = 736
+        private static readonly int size = 736;
 
         // Patrón singleton.
         private static Memoria instance = null;
@@ -36,10 +38,44 @@ namespace SimuladorMIPS
             Debug.Print("Memoria creada.");
         }
 
-        // TODO: Retorna los contenidos de la memoria de forma que sea legible en la consola.
+        // Retorna los contenidos de la memoria de forma que sea legible en la consola.
         public string PrettyPrint()
         {
-            throw new NotImplementedException();
+            string output;
+
+            output = "\tDatos:\n";
+
+            // 6 filas, 4 columnas, 4 enteros por columna.
+            for (int i = 0; i < 6; i++)
+            {
+                for (int j = 0; j < 4; j++)
+                {
+                    for (int k = 0; k < 4; k++)
+                    {
+                        output += Mem[i] + " "; // YOLO.
+                    }
+                    output += " ";
+                }
+                output += "\n";
+            }
+
+            output += "\n\tInstrucciones:\n";
+
+            // 40 filas, 4 columnas, 4 enteros (una instrucción) por columna.
+            for (int i = 0; i < 40; i++)
+            {
+                for (int j = 0; j < 4; j++)
+                {
+                    for (int k = 0; k < 4; k++)
+                    {
+                        output += Mem[i] + " "; // YOLO.
+                    }
+                    output += " ";
+                }
+                output += "\n";
+            }
+
+            return output;
         }
 
         // Los buses podrían ser cualquier estructura de datos.
