@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,15 +20,18 @@ namespace SimuladorMIPS
             NucleoMultihilillo N0 = NucleoMultihilillo.Instance;
             NucleoMonohilillo N1 = NucleoMonohilillo.Instance;
             Queue<Hilillo> colaHilillos = new Queue<Hilillo>();
+            List<Hilillo> hilillosFinalizados = new List<Hilillo>();
             Barrier barrera = new Barrier(3);
             int reloj = 0;
 
             // TIP: La clase Debug permite imprimir mensajes de debug en una consola distinta de la principal.
-            Debug.Print("Asignando cola de hilillos y barrera a núcleos...");
+            Debug.Print("Asignando colas de hilillos y barrera a núcleos...");
             N0.ColaHilillos = colaHilillos;
             N1.ColaHilillos = colaHilillos;
             N0.Barrera = barrera;
             N1.Barrera = barrera;
+            N0.HilillosFinalizados = hilillosFinalizados;
+            N1.HilillosFinalizados = hilillosFinalizados;
 
             // Solicitar al usuario hilillos a correr y cargarlos en memoria.
             int direccionDeInicioDeHilillo = 384; // Indica dónde comienza las instrucciones de cada hilillo.
@@ -37,32 +40,41 @@ namespace SimuladorMIPS
             Console.WriteLine("Inserte el nombre de un archivo de hilillo o 'c' para continuar.");
             string nombreDeArchivo = Console.ReadLine();
 
-            // TODO: Revisar posibles excepciones.
             while (nombreDeArchivo != "c")
             {
-                Hilillo h = new Hilillo(direccionDeInicioDeHilillo);
-                colaHilillos.Enqueue(h);
-                // TODO: Asignar nombre e identificación.
+                Hilillo h = new Hilillo(direccionDeInicioDeHilillo, nombreDeArchivo);
 
-                StreamReader archivo = new StreamReader(nombreDeArchivo);
-                while (!archivo.EndOfStream)
+                StreamReader archivo;
+                try
                 {
-                    string instruccion = "";
-                    try
+                    archivo = new StreamReader(nombreDeArchivo);
+
+                    int dir = direccionDeInicioDeHilillo;
+                    while (!archivo.EndOfStream)
                     {
-                        instruccion = archivo.ReadLine();
+                        string instruccion = "";
+                        try
+                        {
+                            instruccion = archivo.ReadLine();
+                        }
+                        catch (IOException e)
+                        {
+                            Console.WriteLine("Error al leer el archivo.");
+                            break;
+                        }
+                        string[] temp = instruccion.Split(' ');
+                        for (int i = 0; i < 4; i++)
+                            mem.Mem[dir + i] = Convert.ToInt32(temp[i]);
+                        dir += 4;
                     }
-                    catch (IOException e)
-                    {
-                        // TODO: Revisar qué hacer en este caso.
-                        Console.WriteLine("Error al leer el archivo.");
-                        break;
-                    }
-                    string[] temp = instruccion.Split(' ');
-                    for (int i = 0; i < 4; i++)
-                        mem.Mem[direccionDeInicioDeHilillo + i] = Convert.ToInt32(temp[i]);
-                    direccionDeInicioDeHilillo += 4;
                 }
+                catch (FileNotFoundException e)
+                {
+                    Console.WriteLine("No se encontró el archivo.");
+                }
+
+                colaHilillos.Enqueue(h);
+                direccionDeInicioDeHilillo = dir;
 
                 Console.WriteLine("Inserte el nombre de un archivo hilillo o 'c' para continuar.");
                 nombreDeArchivo = Console.ReadLine();
@@ -108,24 +120,24 @@ namespace SimuladorMIPS
 
                 // Imprimir identificación de hilillos en ejecución.
                 Console.WriteLine("Hilillos en ejecución:");
-                Console.WriteLine("     Núcleo 0:");
-                Console.WriteLine(N0.PrettyPrintHilillos()); // TODO: Sección crítica.
+                Console.WriteLine("\tNúcleo 0:");
+                Console.WriteLine(N0.PrettyPrintHilillos());
 
-                Console.WriteLine("     Núcleo 1:");
-                Console.WriteLine(N1.PrettyPrintHilillos()); // TODO: Sección crítica.
+                Console.WriteLine("\tNúcleo 1:");
+                Console.WriteLine(N1.PrettyPrintHilillos());
 
                 if (ejecucionLentaActivada && reloj % 20 == 0)
                 {
                     // Imprimir memoria, cachés y registros.
                     Console.WriteLine("Contenido de la memoria:");
-                    Console.WriteLine(mem.PrettyPrint()); // TODO: Sección crítica.
+                    Console.WriteLine(mem.PrettyPrint());
 
                     Console.WriteLine("Registros y cachés:");
-                    Console.WriteLine("     Núcleo 0:");
-                    Console.WriteLine(N0.PrettyPrintRegistrosYCaches()); // TODO: Sección crítica.
+                    Console.WriteLine("\tNúcleo 0:");
+                    Console.WriteLine(N0.PrettyPrintRegistrosYCaches());
 
-                    Console.WriteLine("     Núcleo 1:");
-                    Console.WriteLine(N1.PrettyPrintRegistrosYCaches()); // TODO: Sección crítica.
+                    Console.WriteLine("\tNúcleo 1:");
+                    Console.WriteLine(N1.PrettyPrintRegistrosYCaches());
 
                     Console.ReadKey();
                 }
@@ -142,9 +154,11 @@ namespace SimuladorMIPS
             Debug.Print("Hilo principal: fin de sección crítica. Los núcleos terminaron.");
 
             // Finalizar hilos y barrera.
-            nucleo0.Abort(); // TODO: Verificar el funcionamiento correcto de esta función.
+            nucleo0.Abort(); // TODO: Verificar correcto funcionamiento de esta función.
             nucleo1.Abort();
             barrera.Dispose();
+
+            Console.WriteLine("Fin de la simulación.\n");
 
             // Imprimir contenido de memoria y cachés.
             Console.WriteLine("Contenido de la memoria:");
@@ -157,8 +171,12 @@ namespace SimuladorMIPS
             Console.WriteLine("     Núcleo 1:");
             Console.WriteLine(N1.PrettyPrintRegistrosYCaches());
 
-            // TODO: Para cada hilillo que corrió, imprimir registros y ciclos que duró.
-            // WARNING: Revisar diseño para lograr lo anterior.
+            // Para cada hilillo que corrió, imprimir registros y ciclos que duró.
+            Console.WriteLine("Hilillos que corrieron:");
+            foreach (Hilillo h in hilillosFinalizados)
+            {
+                Console.WriteLine(h.PrettyPrintRegistrosYCiclos());
+            }
         }
     }
 }
