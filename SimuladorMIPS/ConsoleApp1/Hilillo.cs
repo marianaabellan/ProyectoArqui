@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,13 +9,13 @@ namespace SimuladorMIPS
 {
     class Hilillo
     {
-        public Hilillo(int direccionDeInicio)
+        public Hilillo(int direccionDeInicio, string nombre)
         {
             PC = direccionDeInicio;
+            this.nombre = nombre;
         }
 
         public int PC { get; set; }
-
-        // TODO: Nombre e identificación.
+        public readonly string Nombre { get; set; }
     }
 }
