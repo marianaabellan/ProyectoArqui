@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -38,10 +38,13 @@ namespace SimuladorMIPS
             throw new NotImplementedException();
         }
 
-        // TODO: Retorna información general de los hilillos que están corriendo para desplegarla en pantalla durante la ejecución.
+        // Retorna información general de los hilillos que están corriendo para desplegarla en pantalla durante la ejecución.
         public string PrettyPrintHilillos()
         {
-            throw new NotImplementedException();
+            string output  = "\t\tHilillo 0: " + h[0].Nombre + "\n" // YOLO.
+                    + "\t\tHilillo 1: " + h[1].Nombre;
+
+            return output;
         }
 
         // TODO: Retorna los contenidos de los registros y las cachés, de forma legible en consola.
@@ -54,5 +57,9 @@ namespace SimuladorMIPS
         public bool Terminado { get; set; }
         public int Quantum { get; set; }
         public Barrier Barrera { get; set; }
+        public List<Hilillo> HilillosFinalizados { get; set; }
+        public bool Cancelado { get; set; }
+
+        private Hilillo[] h;
     }
 }
