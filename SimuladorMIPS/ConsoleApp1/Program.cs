@@ -20,7 +20,7 @@ namespace SimuladorMIPS
             NucleoMultihilillo N0 = NucleoMultihilillo.Instance;
             NucleoMonohilillo N1 = NucleoMonohilillo.Instance;
             Queue<Hilillo> colaHilillos = new Queue<Hilillo>();
-            List<Hilillo> hilillosFinalizados = new List<Hilillo>();
+            List<Hilillo> hilillosFinalizados = new List<Hilillo>(); // WARNING: Colocar los hilillos finalizados en esta lista.
             Barrier barrera = new Barrier(3);
             int reloj = 0;
 
