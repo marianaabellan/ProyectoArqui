@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -67,14 +67,14 @@ namespace SimuladorMIPS
                             mem.Mem[dir + i] = Convert.ToInt32(temp[i]);
                         dir += 4;
                     }
+
+                    colaHilillos.Enqueue(h);
+                    direccionDeInicioDeHilillo = dir;
                 }
                 catch (FileNotFoundException e)
                 {
                     Console.WriteLine("No se encontró el archivo.");
                 }
-
-                colaHilillos.Enqueue(h);
-                direccionDeInicioDeHilillo = dir;
 
                 Console.WriteLine("Inserte el nombre de un archivo hilillo o 'c' para continuar.");
                 nombreDeArchivo = Console.ReadLine();

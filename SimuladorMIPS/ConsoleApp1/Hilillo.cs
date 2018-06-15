@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,10 +12,16 @@ namespace SimuladorMIPS
         public Hilillo(int direccionDeInicio, string nombre)
         {
             PC = direccionDeInicio;
-            this.nombre = nombre;
+            this.Nombre = nombre;
+        }
+
+        // TODO: Implementar función.
+        public string PrettyPrintRegistrosYCiclos()
+        {
+            throw new NotImplementedException();
         }
 
         public int PC { get; set; }
-        public readonly string Nombre { get; set; }
+        public string Nombre { get; }
     }
 }
