@@ -59,5 +59,12 @@ namespace SimuladorMIPS
         public List<Hilillo> HilillosFinalizados { get; set; }
 
         private Hilillo h;
+
+        // TIP: Ver diferencia entre "jagged array" y "multidimensional array".
+        public int[,] CacheDatos;
+        private const int NUM_BLOQUE = 4, ESTADO = 5;
+        private enum Estado { I, M, C }
+
+        private CacheInstrucciones CacheInstr;
     }
 }
