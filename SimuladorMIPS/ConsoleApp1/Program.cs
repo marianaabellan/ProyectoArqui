@@ -39,6 +39,10 @@ namespace SimuladorMIPS
             N0.HilillosFinalizados = hilillosFinalizados;
             N1.HilillosFinalizados = hilillosFinalizados;
 
+            Debug.Print("Dando acceso a cada núcleo al otro.");
+            N0.N1 = N1;
+            N1.N0 = N0;
+
             // Solicitar al usuario hilillos a correr y cargarlos en memoria.
             int direccionDeInicioDeHilillo = 384; // Indica dónde comienza las instrucciones de cada hilillo.
             Console.WriteLine("Usted se encuentra en la carpeta " + Directory.GetCurrentDirectory());

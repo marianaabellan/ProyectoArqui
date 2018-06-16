@@ -122,7 +122,104 @@ namespace SimuladorMIPS
         // i: número del hilillo del cual se va a manejar el fallo.
         private void MissD(int i)
         {
-            throw new NotImplementedException();
+            Debug.Assert(h[i].Fase == Hilillo.FaseDeHilillo.FD);
+
+            int Y = h[i].IR.Operando[0];
+            int X = h[i].IR.Operando[1];
+            int n = h[i].IR.Operando[2];
+            int direccionDeMemoria = h[i].Registro[Y] + n;
+            int bloqueDeMemoria = direccionDeMemoria / 16;
+            int posicionEnCache = bloqueDeMemoria % tamanoCache;
+            int palabra = (direccionDeMemoria - bloqueDeMemoria * 16) / 4;
+
+            Debug.Print("Núcleo 0: Fallo de datos. Revisando bloque " + bloqueDeMemoria
+                + " en posición de caché " + posicionEnCache + " para hilillo " + i + ".");
+
+            if (!h[i].Recursos)
+            {
+                Debug.Print("Núcleo 0: Recursos no disponibles.");
+
+                if (!Monitor.TryEnter(CacheD.NumBloque[posicionEnCache]))
+                {
+                    Debug.Print("Núcleo 0: No se pudo bloquear posición en caché. Fin de MissD().");
+                    return;
+                }
+                if (!Monitor.TryEnter(Memoria.Instance.BusDeDatos))
+                {
+                    Monitor.Exit(CacheD.NumBloque[posicionEnCache]);
+                    Debug.Print("Núcleo 0: No se pudo bloquear bus de datos. Fin de MissD().");
+                    return;
+                }
+
+                Debug.Print("Núcleo 0: Se bloqueó la posición de caché y bus de datos.");
+
+                h[i].Recursos = true;
+
+                if (CacheD.Estado[posicionEnCache] == EstadoDeBloque.M)
+                {
+                    Debug.Print("Núcleo 0: Bloque modificado. Es necesario copiar en memoria.");
+                    h[i].Ticks = 40;
+                }
+                else
+                {
+                    goto RevisarEtapaSnooping;
+                }
+            }
+            else
+            {
+                Debug.Print("Núcleo 0: Recursos disponibles.");
+
+                if (CacheD.Estado[posicionEnCache] != EstadoDeBloque.M)
+                {
+                    goto RevisarEtapaSnooping;
+                }
+            }
+
+            h[i].Ticks--;
+            if (h[i].Ticks > 0)
+            {
+                Debug.Print("Núcleo 0: \"Copiando\" bloque modificado en memoria. Ticks restantes: " + h[i].Ticks);
+                return;
+            }
+            else
+            {
+                Debug.Assert(h[i].Ticks == 0);
+
+                // Se copia a memoria el bloque modificado.
+                Debug.Print("Núcleo 0: Copiando bloque de la posición de caché " + posicionEnCache
+                    + " a dirección de memoria " + direccionDeMemoria + "(posición de memoria simulada: "
+                    + (direccionDeMemoria / 4) + ").");
+                for (int j = 0; j < 4; j++)
+                {
+                    Memoria.Instance.Mem[direccionDeMemoria / 4 + i] = CacheD.Cache[i, posicionEnCache];
+                }
+
+                CacheD.Estado[posicionEnCache] = EstadoDeBloque.I;
+            }
+
+            RevisarEtapaSnooping:
+            Debug.Print("Núcleo 0: Revisando etapa de snooping...");
+            switch(h[i].EtapaDeSnooping)
+            {
+                case Hilillo.EtapaSnooping.ANTES:
+                    Debug.Print("Núcleo 0: Etapa de snooping: ANTES.");
+                    if (!Monitor.TryEnter(N1.CacheD.NumBloque[posicionEnCache]))
+                    {
+                        Debug.Print("Núcleo 0: No se pudo reservar la posición de caché en N1. Fin de missD().");
+                        return;
+                    }
+                    if (N1.CacheD.NumBloque[posicionEnCache] != bloqueDeMemoria) // ¿Es la que queremos?
+                    {
+                        // No.
+                        if (h[i].IR.CodigoDeOperacion == CodOp.SW && CacheD.Estado[posicionEnCache] == EstadoDeBloque.C)
+                        {
+                            throw new NotImplementedException();
+                        }
+                    }
+                    throw new NotImplementedException();
+                default:
+                    throw new NotImplementedException();
+            }
         }
 
         private void Tick()
@@ -220,5 +317,7 @@ namespace SimuladorMIPS
         public CacheDatos CacheD { get; set; } 
         private CacheInstrucciones CacheI; // Miembro privado, porque nadie va a acceder a ella desde fuera.
         private const int tamanoCache = 8;
+
+        public NucleoMonohilillo N1 { get; set; }
     }
 }

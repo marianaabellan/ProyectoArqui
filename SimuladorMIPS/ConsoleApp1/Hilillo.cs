@@ -28,6 +28,8 @@ namespace SimuladorMIPS
         {
             PC = direccionDeInicio;
             this.Nombre = nombre;
+            IR = new Instruccion();
+            Debug.Assert(IR.Operando[0] == 0);
             Registro = new int[32];
             Ciclos = 0;
             Fase = FaseDeHilillo.L;
@@ -51,8 +53,17 @@ namespace SimuladorMIPS
         }
 
         public int PC { get; set; }
-        public string Nombre { get; }
+        public Instruccion IR { get; set; }
         public int[] Registro { get; set; }
+        public int Quantum { get; set; }
+
+        public enum EtapaSnooping { ANTES, DURANTE, CARGAR, DESPUES }
+
+        public bool Recursos { get; set; }
+        public int Ticks { get; set; }
+        public EtapaSnooping EtapaDeSnooping { get; set; }
+
+        public string Nombre { get; }
         public int Ciclos;
 
         public enum FaseDeHilillo { V, L, FI, IR, FD, Exec, Fin }

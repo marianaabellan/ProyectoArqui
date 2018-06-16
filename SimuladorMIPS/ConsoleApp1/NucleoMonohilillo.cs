@@ -195,5 +195,7 @@ namespace SimuladorMIPS
         public CacheDatos CacheD { get; set; }
         private CacheInstrucciones CacheI; // Miembro privado, porque nadie va a acceder a ella desde fuera.
         private const int tamanoCache = 4;
+
+        public NucleoMultihilillo N0 { get; set; }
     }
 }
