@@ -29,8 +29,8 @@ namespace SimuladorMIPS
         private NucleoMonohilillo()
         {
             Terminado = false;
-            CacheD = new CacheDatos(4);
-            CacheI = new CacheInstrucciones(4);
+            CacheD = new CacheDatos(tamanoCache);
+            CacheI = new CacheInstrucciones(tamanoCache);
             Debug.Print("Núcleo 1 creado.");
         }
 
@@ -48,10 +48,72 @@ namespace SimuladorMIPS
             return output;
         }
 
-        // TODO: Retorna los contenidos de los registros y las cachés, de forma legible en consola.
+        // Retorna los contenidos de los registros y las cachés, de forma legible en consola.
         public string PrettyPrintRegistrosYCaches()
         {
-            throw new NotImplementedException();
+            string output = "";
+
+            output += "\t\tRegistros: \n"
+                + "\t\t\tHilillo 0:\n"
+                + h.PrettyPrintRegistrosYCiclos()
+                + "\t\tCachés:\n"
+                + "\t\t\tCaché de instrucciones:\n\n";
+
+            for (int i = 0; i < tamanoCache; i++)
+            {
+                output += "Posición " + i + "\t";
+            }
+            output += "\n";
+
+            for (int i = 0; i < 4; i++)
+            {
+                for (int j = 0; j < tamanoCache; j++)
+                {
+                    output += CacheI.Cache[i, j].CodigoDeOperacion + " ";
+                    for (int k = 0; k < 3; k++)
+                    {
+                        output += CacheI.Cache[i, j].Operando[k] + " ";
+                    }
+                    output += "\t";
+                }
+                output += "\n";
+            }
+
+            for (int i = 0; i < tamanoCache; i++)
+            {
+                output += CacheI.NumBloque[i] + "\t";
+            }
+
+            output += "\n\n";
+
+            output += "\t\t\tCaché de datos:\n\n";
+
+            for (int i = 0; i < tamanoCache; i++)
+            {
+                output += "Posición " + i + "\t";
+            }
+            output += "\n";
+
+            for (int i = 0; i < 4; i++)
+            {
+                for (int j = 0; j < tamanoCache; j++)
+                {
+                    output += CacheD.Cache[i, j] + "\t";
+                }
+                output += "\n";
+            }
+
+            for (int i = 0; i < tamanoCache; i++)
+            {
+                output += CacheD.NumBloque[i] + "\t";
+            }
+
+            for (int i = 0; i < tamanoCache; i++)
+            {
+                output += CacheD.Estado[i] + "\t";
+            }
+
+            return output;
         }
 
         public Queue<Hilillo> ColaHilillos { get; set; }
@@ -65,5 +127,6 @@ namespace SimuladorMIPS
 
         public CacheDatos CacheD { get; set; }
         private CacheInstrucciones CacheI; // Miembro privado, porque nadie va a acceder a ella desde fuera.
+        private const int tamanoCache = 4;
     }
 }
