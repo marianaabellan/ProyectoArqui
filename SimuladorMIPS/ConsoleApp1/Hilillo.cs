@@ -9,12 +9,28 @@ namespace SimuladorMIPS
 {
     class Hilillo
     {
+        // WARNING: Para evitar problemas de inconsistencia, usar este hilillo siempre que se necesite un hilillo vacío.
+        private static Hilillo hililloVacio;
+        public static Hilillo HililloVacio
+        {
+            get
+            {
+                if (hililloVacio == null)
+                {
+                    hililloVacio = new Hilillo(0, "vacío");
+                    hililloVacio.Fase = FaseDeHilillo.V;
+                }
+                return hililloVacio;
+            }
+        }
+
         public Hilillo(int direccionDeInicio, string nombre)
         {
             PC = direccionDeInicio;
             this.Nombre = nombre;
             Registro = new int[32];
             Ciclos = 0;
+            Fase = FaseDeHilillo.L;
         }
 
         // Esta función se llama al final para imprimir datos de un hilillo finalizado.
@@ -38,5 +54,9 @@ namespace SimuladorMIPS
         public string Nombre { get; }
         public int[] Registro { get; set; }
         public int Ciclos;
+
+        public enum FaseDeHilillo { V, L, FI, IR, FD, Exec, Fin }
+
+        public FaseDeHilillo Fase;
     }
 }

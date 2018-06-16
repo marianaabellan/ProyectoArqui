@@ -34,8 +34,31 @@ namespace SimuladorMIPS
             Debug.Print("Núcleo 1 creado.");
         }
 
-        // TODO: Carga un hilillo y ejecuta run() en un ciclo infinito.
+        // Carga un hilillo y ejecuta Run() en un ciclo infinito.
         public void Start()
+        {
+            lock (ColaHilillos)
+            {
+                if (ColaHilillos.Count > 0)
+                {
+                    h = ColaHilillos.Dequeue();
+                    // TIP: Es útil usar asserts de Debug cuando pensamos un caso que "nunca pasa".
+                    Debug.Assert(h.Fase == Hilillo.FaseDeHilillo.L); // Creo que debería estar listo, pues es el inicio de la simulación.
+                }
+                else
+                {
+                    h = Hilillo.HililloVacio;
+                }
+            }
+
+            while (true)
+            {
+                Run();
+            }
+        }
+
+        // TODO: Aquí va la lógica general: fetch, execute, missI, missD.
+        private void Run()
         {
             throw new NotImplementedException();
         }
