@@ -28,7 +28,9 @@ namespace SimuladorMIPS
 
         private NucleoMultihilillo()
         {
-            // TODO: Inicializar cachés con ceros.
+            Terminado = false;
+            CacheD = new CacheDatos(8);
+            CacheI = new CacheInstrucciones(8);
             Debug.Print("Núcleo 0 creado.");
         }
 
@@ -41,7 +43,8 @@ namespace SimuladorMIPS
         // Retorna información general de los hilillos que están corriendo para desplegarla en pantalla durante la ejecución.
         public string PrettyPrintHilillos()
         {
-            string output = "\t\tHilillo 0: " + h.Nombre; // YOLO.
+            string output = "\t\tHilillo 0: " + h[0].Nombre + "\n" // YOLO.
+                    + "\t\tHilillo 1: " + h[1].Nombre;
 
             return output;
         }
@@ -58,13 +61,9 @@ namespace SimuladorMIPS
         public Barrier Barrera { get; set; }
         public List<Hilillo> HilillosFinalizados { get; set; }
 
-        private Hilillo h;
+        private Hilillo[] h;
 
-        // TIP: Ver diferencia entre "jagged array" y "multidimensional array".
-        public int[,] CacheDatos;
-        private const int NUM_BLOQUE = 4, ESTADO = 5;
-        private enum Estado { I, M, C }
-
-        private CacheInstrucciones CacheInstr;
+        public CacheDatos CacheD { get; set; } 
+        private CacheInstrucciones CacheI; // Miembro privado, porque nadie va a acceder a ella desde fuera.
     }
 }

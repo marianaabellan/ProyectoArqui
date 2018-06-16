@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CacheDatos.cs" />
     <Compile Include="CacheInstrucciones.cs" />
     <Compile Include="CodOp.cs" />
     <Compile Include="Hilillo.cs" />

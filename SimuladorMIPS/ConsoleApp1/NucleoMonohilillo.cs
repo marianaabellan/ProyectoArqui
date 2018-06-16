@@ -28,7 +28,9 @@ namespace SimuladorMIPS
 
         private NucleoMonohilillo()
         {
-            // TODO: Inicializar cachés con ceros.
+            Terminado = false;
+            CacheD = new CacheDatos(4);
+            CacheI = new CacheInstrucciones(4);
             Debug.Print("Núcleo 1 creado.");
         }
 
@@ -41,8 +43,7 @@ namespace SimuladorMIPS
         // Retorna información general de los hilillos que están corriendo para desplegarla en pantalla durante la ejecución.
         public string PrettyPrintHilillos()
         {
-            string output  = "\t\tHilillo 0: " + h[0].Nombre + "\n" // YOLO.
-                    + "\t\tHilillo 1: " + h[1].Nombre;
+            string output = "\t\tHilillo 0: " + h.Nombre; // YOLO.
 
             return output;
         }
@@ -60,6 +61,9 @@ namespace SimuladorMIPS
         public List<Hilillo> HilillosFinalizados { get; set; }
         public bool Cancelado { get; set; }
 
-        private Hilillo[] h;
+        private Hilillo h;
+
+        public CacheDatos CacheD { get; set; }
+        private CacheInstrucciones CacheI; // Miembro privado, porque nadie va a acceder a ella desde fuera.
     }
 }
