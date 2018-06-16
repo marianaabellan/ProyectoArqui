@@ -10,6 +10,12 @@ using System.IO;
 
 // <>
 
+// Ricardo: Tengo una idea: para evitar los "YOLO" a la hora de imprimir cosas,
+// se podría bloquear los hilillos de los núcleos durante todo el tick de reloj
+// y desbloquearlos al final. Luego, cuando se imprime, también se pide el lock.
+// Esto evitaría problemas de acceso concurrente sin tener que estar pidiendo
+// locks a cada rato.
+
 namespace SimuladorMIPS
 {
     class Program

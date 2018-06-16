@@ -57,8 +57,52 @@ namespace SimuladorMIPS
             }
         }
 
-        // TODO: Aquí va la lógica general: fetch, execute, missI, missD.
+        // Aquí va la lógica general: fetch, execute, missI, missD.
         private void Run()
+        {
+            if (h.Fase == Hilillo.FaseDeHilillo.L)
+            {
+                Fetch();
+            }
+            else if (h.Fase == Hilillo.FaseDeHilillo.IR)
+            {
+                Execute();
+            }
+
+            if (h.Fase == Hilillo.FaseDeHilillo.FI)
+            {
+                MissI();
+            }
+
+            if (h.Fase == Hilillo.FaseDeHilillo.FD)
+            {
+                MissD();
+            }
+
+            Tick();
+        }
+
+        private void Fetch()
+        {
+            throw new NotImplementedException();
+        }
+
+        private void Execute()
+        {
+            throw new NotImplementedException();
+        }
+
+        private void MissI()
+        {
+            throw new NotImplementedException();
+        }
+
+        private void MissD()
+        {
+            throw new NotImplementedException();
+        }
+
+        private void Tick()
         {
             throw new NotImplementedException();
         }

@@ -58,8 +58,74 @@ namespace SimuladorMIPS
             }
         }
 
-        // TODO: Aquí va la lógica general: fetch, execute, missI, missD.
+        // Aquí va la lógica general: fetch, execute, missI, missD.
         private void Run()
+        {
+            if (h[0].Fase == Hilillo.FaseDeHilillo.L)
+            {
+                Fetch(0);
+            }
+            else if (h[0].Fase == Hilillo.FaseDeHilillo.IR)
+            {
+                Execute(0);
+            }
+            else if (h[1].Fase == Hilillo.FaseDeHilillo.L)
+            {
+                Fetch(1);
+            }
+            else if(h[1].Fase == Hilillo.FaseDeHilillo.IR)
+            {
+                Execute(1);
+            }
+
+            Debug.Assert(!(h[0].Fase == Hilillo.FaseDeHilillo.FI && h[1].Fase == Hilillo.FaseDeHilillo.FI));
+            if (h[0].Fase == Hilillo.FaseDeHilillo.FI)
+            {
+                MissI(0);
+            }
+            else if (h[1].Fase == Hilillo.FaseDeHilillo.FI)
+            {
+                MissI(1);
+            }
+
+            Debug.Assert(!(h[0].Fase == Hilillo.FaseDeHilillo.FD && h[1].Fase == Hilillo.FaseDeHilillo.FD));
+            if (h[0].Fase == Hilillo.FaseDeHilillo.FD)
+            {
+                MissD(0);
+            }
+            else if (h[1].Fase == Hilillo.FaseDeHilillo.FD)
+            {
+                MissD(1);
+            }
+
+            Tick();
+        }
+
+        // i: número del hilillo que va a hacer el fetch.
+        private void Fetch(int i)
+        {
+            throw new NotImplementedException();
+        }
+
+        // i: número del hilillo que se va a ejecutar.
+        private void Execute(int i)
+        {
+            throw new NotImplementedException();
+        }
+
+        // i: número del hilillo del cual se va a manejar el fallo.
+        private void MissI(int i)
+        {
+            throw new NotImplementedException();
+        }
+
+        // i: número del hilillo del cual se va a manejar el fallo.
+        private void MissD(int i)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void Tick()
         {
             throw new NotImplementedException();
         }
