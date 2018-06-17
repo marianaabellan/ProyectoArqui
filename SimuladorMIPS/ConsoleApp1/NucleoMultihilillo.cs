@@ -31,6 +31,7 @@ namespace SimuladorMIPS
             Terminado = false;
             CacheD = new CacheDatos(tamanoCache);
             CacheI = new CacheInstrucciones(tamanoCache);
+            busDeDatosReservado = busDeInstruccionesReservado = false;
             Debug.Print("Núcleo 0 creado.");
         }
 
@@ -191,7 +192,7 @@ namespace SimuladorMIPS
                     + (direccionDeMemoria / 4) + ").");
                 for (int j = 0; j < 4; j++)
                 {
-                    Memoria.Instance.Mem[direccionDeMemoria / 4 + i] = CacheD.Cache[i, posicionEnCache];
+                    Memoria.Instance.Mem[direccionDeMemoria / 4 + j] = CacheD.Cache[j, posicionEnCache];
                 }
 
                 CacheD.Estado[posicionEnCache] = EstadoDeBloque.I;
@@ -199,7 +200,7 @@ namespace SimuladorMIPS
 
             RevisarEtapaSnooping:
             Debug.Print("Núcleo 0: Revisando etapa de snooping...");
-            int posicionEnCacheN1 = posicionEnCache % 4;
+            int posicionEnCacheN1 = posicionEnCache % NucleoMonohilillo.tamanoCache;
             switch(h[i].EtapaDeSnooping)
             {
                 case Hilillo.EtapaSnooping.ANTES:
@@ -238,12 +239,146 @@ namespace SimuladorMIPS
                     {
                         // Sí.
                         Debug.Print("Núcleo 0: El bloque sí está en N1.");
-                        throw new NotImplementedException();
+                        if (N1.CacheD.Estado[posicionEnCacheN1] == EstadoDeBloque.C)
+                        {
+                            Debug.Print("Núcleo 0: El bloque en N1 está compartido.");
+                            if (h[i].IR.CodigoDeOperacion == CodOp.LW)
+                            {
+                                Debug.Print("Núcleo 0: La operación es un LW, por lo que no hay que hacer nada en N1.");
+                                Debug.Print("Núcleo 0: Se debe cargar dato desde memoria. Pasando a etapa \"cargar\"...");
+                                h[i].EtapaDeSnooping = Hilillo.EtapaSnooping.CARGAR;
+                                Monitor.Exit(N1.CacheD.NumBloque[posicionEnCacheN1]);
+                                h[i].Ticks = 40;
+                                goto case Hilillo.EtapaSnooping.CARGAR;
+                            }
+                            else
+                            {
+                                Debug.Assert(h[i].IR.CodigoDeOperacion == CodOp.SW);
+                                Debug.Print("Núcleo 0: La operación es un SW, por lo que invalidamos el bloque en N1.");
+                                N1.CacheD.Estado[posicionEnCacheN1] = EstadoDeBloque.I;
+
+                                if(CacheD.Estado[posicionEnCache] != EstadoDeBloque.C)
+                                {
+                                    Debug.Print("Núcleo 0: Se debe cargar dato desde memoria. Pasando a etapa \"cargar\"...");
+                                    h[i].EtapaDeSnooping = Hilillo.EtapaSnooping.CARGAR;
+                                    Monitor.Exit(N1.CacheD.NumBloque[posicionEnCacheN1]);
+                                    h[i].Ticks = 40;
+                                    goto case Hilillo.EtapaSnooping.CARGAR;
+                                }
+                                else
+                                {
+                                    Debug.Assert(CacheD.Estado[posicionEnCache] == EstadoDeBloque.I);
+                                    Debug.Print("Núcleo 0: Caso especial de SW con bloque en C."
+                                        + " No es necesario cargar el dato de memoria. Pasando a etapa \"después\"...");
+                                    Monitor.Exit(N1.CacheD.NumBloque[posicionEnCacheN1]);
+                                    h[i].EtapaDeSnooping = Hilillo.EtapaSnooping.DESPUES;
+                                    goto case Hilillo.EtapaSnooping.DESPUES;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            Debug.Assert(N1.CacheD.Estado[posicionEnCacheN1] == EstadoDeBloque.M);
+                            Debug.Print("Núcleo 0: El bloque en N1 está modificado; es necesario copiarlo a memoria y a N0."
+                                + " Pasando a etapa \"durante\"...");
+
+                            h[i].EtapaDeSnooping = Hilillo.EtapaSnooping.DURANTE;
+                            h[i].Ticks = 40;
+                            goto case Hilillo.EtapaSnooping.DURANTE;
+                        }
                     }
-                case Hilillo.EtapaSnooping.CARGAR:
-                case Hilillo.EtapaSnooping.DESPUES:
                 case Hilillo.EtapaSnooping.DURANTE:
-                    throw new NotImplementedException();
+                    Debug.Print("Núcleo 0: Etapa snooping: DURANTE.");
+                    h[i].Ticks--;
+                    if (h[i].Ticks > 0)
+                    {
+                        Debug.Print("Núcleo 0: \"Copiando\" bloque de N1 a memoria y N0. Ticks restantes: " + h[i].Ticks);
+                        return;
+                    }
+                    else
+                    {
+                        Debug.Assert(h[i].Ticks == 0);
+                        Debug.Print("Núcleo 0: Copiando bloque de la posición de caché " + posicionEnCacheN1
+                            + " (en N1) a dirección de memoria " + direccionDeMemoria + "(posición de memoria simulada: "
+                            + (direccionDeMemoria / 4) + ") y a la posición de caché " + posicionEnCache + " en N0.");
+
+                        for (int j = 0; j < 4; j++)
+                        {
+                            CacheD.Cache[j, posicionEnCache] = Memoria.Instance.Mem[direccionDeMemoria / 4 + j] = N1.CacheD.Cache[j, posicionEnCacheN1];
+                        }
+
+                        if (h[i].IR.CodigoDeOperacion == CodOp.LW)
+                        {
+                            Debug.Print("Núcleo 0: La instrucción es un LW; el bloque en N1 queda en C.");
+                            N1.CacheD.Estado[posicionEnCacheN1] = EstadoDeBloque.C;
+                        }
+                        else
+                        {
+                            Debug.Assert(h[i].IR.CodigoDeOperacion == CodOp.SW);
+                            Debug.Print("Núcleo 0: La instrucción es un SW; el bloque en N1 queda en I.");
+                            N1.CacheD.Estado[posicionEnCacheN1] = EstadoDeBloque.I;
+                        }
+
+                        Monitor.Exit(N1.CacheD.NumBloque[posicionEnCacheN1]);
+
+                        h[i].EtapaDeSnooping = Hilillo.EtapaSnooping.DESPUES;
+                        goto case Hilillo.EtapaSnooping.DESPUES;
+                    }
+
+                case Hilillo.EtapaSnooping.CARGAR:
+                    Debug.Print("Núcleo 0: Etapa snooping: CARGAR.");
+                    h[i].Ticks--;
+                    if (h[i].Ticks > 0)
+                    {
+                        Debug.Print("Núcleo 0: \"Copiando\" bloque de memoria a N0. Ticks restantes: " + h[i].Ticks);
+                        return;
+                    }
+                    else
+                    {
+                        Debug.Assert(h[i].Ticks == 0);
+                        Debug.Print("Núcleo 0: Copiando bloque de la dirección de memoria " 
+                            + direccionDeMemoria + "(posición de memoria simulada: "
+                            + (direccionDeMemoria / 4) + ") a la posición de caché " + posicionEnCache + " en N0.");
+
+                        for (int j = 0; j < 4; j++)
+                        {
+                            CacheD.Cache[j, posicionEnCache] = Memoria.Instance.Mem[direccionDeMemoria / 4 + j];
+                        }
+
+                        h[i].EtapaDeSnooping = Hilillo.EtapaSnooping.DESPUES;
+                        goto case Hilillo.EtapaSnooping.DESPUES;
+                    }
+
+                case Hilillo.EtapaSnooping.DESPUES:
+                    Debug.Print("Núcleo 0: Etapa snooping: CARGAR.");
+
+                    Debug.Print("Núcleo 0: Terminamos de usar el bus de datos. Se libera.");
+                    Monitor.Exit(Memoria.Instance.BusDeDatos);
+
+                    if (h[i].IR.CodigoDeOperacion == CodOp.LW)
+                    {
+                        Debug.Print("Núcleo 0: La operación es un LW, se copia de posición en caché " + posicionEnCache
+                            + ", palabra " + palabra + ", a registro " + X + ". El bloque queda compartido.");
+                        h[i].Registro[X] = CacheD.Cache[palabra, posicionEnCache];
+                        CacheD.Estado[posicionEnCache] = EstadoDeBloque.C;
+                    }
+                    else
+                    {
+                        Debug.Assert(h[i].IR.CodigoDeOperacion == CodOp.SW);
+                        Debug.Print("Núcleo 0: La operación es un SW, se copia de. registro " + X + " a posición en caché " 
+                            + posicionEnCache + ", palabra " + palabra +". El bloque queda modificado.");
+                        CacheD.Cache[palabra, posicionEnCache] = h[i].Registro[X];
+                        CacheD.Estado[posicionEnCache] = EstadoDeBloque.M;
+                    }
+
+                    Debug.Print("Núcleo 0: Terminamos de usar la caché. Se libera.");
+                    Monitor.Exit(CacheD.NumBloque[posicionEnCache]);
+
+                    CacheD.Reservado[posicionEnCache] = false;
+                    busDeDatosReservado = false;
+
+                    h[i].Fase = Hilillo.FaseDeHilillo.Exec;
+                    return;
             }
         }
 
@@ -341,7 +476,10 @@ namespace SimuladorMIPS
 
         public CacheDatos CacheD { get; set; } 
         private CacheInstrucciones CacheI; // Miembro privado, porque nadie va a acceder a ella desde fuera.
-        private const int tamanoCache = 8;
+        public const int tamanoCache = 8;
+
+        private bool busDeDatosReservado;
+        private bool busDeInstruccionesReservado;
 
         public NucleoMonohilillo N1 { get; set; }
     }

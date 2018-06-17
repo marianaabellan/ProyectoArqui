@@ -10,12 +10,14 @@
         // Por ejemplo, para bloquear la posición 3: TryEnter(CacheD.NumBloque[3]);
         public int[] NumBloque;
         public EstadoDeBloque[] Estado;
+        public bool[] Reservado;
 
         public CacheDatos(int tamano)
         {
             Cache = new int[4, tamano];
             NumBloque = new int[tamano];
             Estado = new EstadoDeBloque[tamano];
+            Reservado = new bool[tamano];
 
             for (int i = 0; i < 4; i++)
             {
