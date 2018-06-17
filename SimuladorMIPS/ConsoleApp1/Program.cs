@@ -175,10 +175,10 @@ namespace SimuladorMIPS
             Console.WriteLine(mem.PrettyPrint());
 
             Console.WriteLine("Registros y cachés:");
-            Console.WriteLine("     Núcleo 0:");
+            Console.WriteLine("\tNúcleo 0:");
             Console.WriteLine(N0.PrettyPrintRegistrosYCaches());
 
-            Console.WriteLine("     Núcleo 1:");
+            Console.WriteLine("\tNúcleo 1:");
             Console.WriteLine(N1.PrettyPrintRegistrosYCaches());
 
             // Para cada hilillo que corrió, imprimir registros y ciclos que duró.
