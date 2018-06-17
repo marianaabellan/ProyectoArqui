@@ -199,25 +199,50 @@ namespace SimuladorMIPS
 
             RevisarEtapaSnooping:
             Debug.Print("Núcleo 0: Revisando etapa de snooping...");
+            int posicionEnCacheN1 = posicionEnCache % 4;
             switch(h[i].EtapaDeSnooping)
             {
                 case Hilillo.EtapaSnooping.ANTES:
                     Debug.Print("Núcleo 0: Etapa de snooping: ANTES.");
-                    if (!Monitor.TryEnter(N1.CacheD.NumBloque[posicionEnCache]))
+                    if (!Monitor.TryEnter(N1.CacheD.NumBloque[posicionEnCacheN1]))
                     {
                         Debug.Print("Núcleo 0: No se pudo reservar la posición de caché en N1. Fin de missD().");
                         return;
                     }
-                    if (N1.CacheD.NumBloque[posicionEnCache] != bloqueDeMemoria) // ¿Es la que queremos?
+
+                    Debug.Print("Núcleo 0: Posición de caché en N1 reservada.");
+
+                    if (N1.CacheD.NumBloque[posicionEnCacheN1] != bloqueDeMemoria 
+                        || (N1.CacheD.NumBloque[posicionEnCacheN1] == bloqueDeMemoria 
+                            && N1.CacheD.Estado[posicionEnCacheN1] == EstadoDeBloque.I)) // ¿Es la que queremos?
                     {
                         // No.
-                        if (h[i].IR.CodigoDeOperacion == CodOp.SW && CacheD.Estado[posicionEnCache] == EstadoDeBloque.C)
+                        Debug.Print("Núcleo 0: El bloque no está en N1.");
+                        if (!(h[i].IR.CodigoDeOperacion == CodOp.SW && CacheD.Estado[posicionEnCache] == EstadoDeBloque.C))
                         {
-                            throw new NotImplementedException();
+                            Debug.Print("Núcleo 0: Se debe cargar dato desde memoria. Pasando a etapa \"cargar\"...");
+                            h[i].EtapaDeSnooping = Hilillo.EtapaSnooping.CARGAR;
+                            Monitor.Exit(N1.CacheD.NumBloque[posicionEnCacheN1]);
+                            h[i].Ticks = 40;
+                            goto case Hilillo.EtapaSnooping.CARGAR;
+                        }
+                        else
+                        {
+                            Debug.Print("Núcleo 0: No es necesario cargar el dato de memoria ni hacer nada en N1. Pasando a etapa \"después\"...");
+                            Monitor.Exit(N1.CacheD.NumBloque[posicionEnCacheN1]);
+                            h[i].EtapaDeSnooping = Hilillo.EtapaSnooping.DESPUES;
+                            goto case Hilillo.EtapaSnooping.DESPUES;
                         }
                     }
-                    throw new NotImplementedException();
-                default:
+                    else
+                    {
+                        // Sí.
+                        Debug.Print("Núcleo 0: El bloque sí está en N1.");
+                        throw new NotImplementedException();
+                    }
+                case Hilillo.EtapaSnooping.CARGAR:
+                case Hilillo.EtapaSnooping.DESPUES:
+                case Hilillo.EtapaSnooping.DURANTE:
                     throw new NotImplementedException();
             }
         }
