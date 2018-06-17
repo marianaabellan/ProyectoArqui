@@ -200,7 +200,7 @@ namespace SimuladorMIPS
 
             RevisarEtapaSnooping:
             Debug.Print("Núcleo 0: Revisando etapa de snooping...");
-            int posicionEnCacheN1 = posicionEnCache % NucleoMonohilillo.tamanoCache;
+            int posicionEnCacheN1 = bloqueDeMemoria % NucleoMonohilillo.tamanoCache;
             switch(h[i].EtapaDeSnooping)
             {
                 case Hilillo.EtapaSnooping.ANTES:
@@ -365,7 +365,7 @@ namespace SimuladorMIPS
                     else
                     {
                         Debug.Assert(h[i].IR.CodigoDeOperacion == CodOp.SW);
-                        Debug.Print("Núcleo 0: La operación es un SW, se copia de. registro " + X + " a posición en caché " 
+                        Debug.Print("Núcleo 0: La operación es un SW, se copia de registro " + X + " a posición en caché " 
                             + posicionEnCache + ", palabra " + palabra +". El bloque queda modificado.");
                         CacheD.Cache[palabra, posicionEnCache] = h[i].Registro[X];
                         CacheD.Estado[posicionEnCache] = EstadoDeBloque.M;
