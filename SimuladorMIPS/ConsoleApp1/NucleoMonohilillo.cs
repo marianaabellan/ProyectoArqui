@@ -31,6 +31,7 @@ namespace SimuladorMIPS
             Terminado = false;
             CacheD = new CacheDatos(tamanoCache);
             CacheI = new CacheInstrucciones(tamanoCache);
+            busDeDatosReservado = busDeInstruccionesReservado = false;
             Debug.Print("Núcleo 1 creado.");
         }
 
@@ -195,6 +196,9 @@ namespace SimuladorMIPS
         public CacheDatos CacheD { get; set; }
         private CacheInstrucciones CacheI; // Miembro privado, porque nadie va a acceder a ella desde fuera.
         public const int tamanoCache = 4;
+
+        private bool busDeDatosReservado;
+        private bool busDeInstruccionesReservado;
 
         public NucleoMultihilillo N0 { get; set; }
     }

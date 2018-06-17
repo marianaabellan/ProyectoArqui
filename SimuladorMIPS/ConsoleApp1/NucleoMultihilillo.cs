@@ -350,7 +350,7 @@ namespace SimuladorMIPS
                     }
 
                 case Hilillo.EtapaSnooping.DESPUES:
-                    Debug.Print("Núcleo 0: Etapa snooping: CARGAR.");
+                    Debug.Print("Núcleo 0: Etapa snooping: DESPUES.");
 
                     Debug.Print("Núcleo 0: Terminamos de usar el bus de datos. Se libera.");
                     Monitor.Exit(Memoria.Instance.BusDeDatos);

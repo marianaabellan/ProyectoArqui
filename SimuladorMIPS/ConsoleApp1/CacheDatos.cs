@@ -31,6 +31,7 @@
             {
                 NumBloque[i] = 0;
                 Estado[i] = EstadoDeBloque.I;
+                Reservado[i] = false;
             }
         }
     }

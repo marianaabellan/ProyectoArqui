@@ -28,7 +28,10 @@
             Reservado = new bool[tamano];
 
             for (int i = 0; i < tamano; i++)
+            {
                 NumBloque[i] = 0;
+                Reservado[i] = false;
+            }
         }
     }
 }
